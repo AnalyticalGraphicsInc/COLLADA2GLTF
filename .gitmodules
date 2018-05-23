@@ -1,0 +1,3 @@
+[submodule "dependencies/OpenCOLLADA/OpenCOLLADA"]
+	path = dependencies/OpenCOLLADA/OpenCOLLADA
+	url = git@github.com:AnalyticalGraphicsInc/agi-OpenCOLLADA.git
