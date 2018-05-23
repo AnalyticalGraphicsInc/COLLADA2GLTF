@@ -493,6 +493,23 @@ namespace GLTF
             
             __AppendIndices(cvtPrimitive, primitiveIndicesVector, tangentIndices, TEXTANGENT, 0);
         }
+
+        //TODO:refactor
+        if (openCOLLADAMeshPrimitive->hasBatchIdIndices()) {
+            unsigned int triangulatedIndicesCount = 0;
+            indices = openCOLLADAMeshPrimitive->getBatchIdIndices().getData();
+            if (shouldTriangulate) {
+                indices = createTrianglesFromPolylist(verticesCountArray, indices, vcount, &triangulatedIndicesCount);
+                count = triangulatedIndicesCount;
+            }
+            shared_ptr <GLTF::GLTFBufferView> batchIdBuffer = createBufferViewWithAllocatedBuffer(indices, 0, count * sizeof(unsigned int), shouldTriangulate ? true : false);
+            shared_ptr <GLTF::GLTFAccessor> batchIdIndices(new GLTF::GLTFAccessor(profile, "UNSIGNED_SHORT", "SCALAR"));
+
+            batchIdIndices->setBufferView(batchIdBuffer);
+            batchIdIndices->setCount(count);
+
+            __AppendIndices(cvtPrimitive, primitiveIndicesVector, batchIdIndices, BATCHID, 0);
+        }
         
         if (verticesCountArray) {
             free(verticesCountArray);
@@ -572,6 +589,9 @@ namespace GLTF
                         break;
                     case GLTF::TEXTANGENT:
                         __ConvertOpenCOLLADAMeshVertexDataToGLTFAccessors(openCOLLADAMesh->getTangents(), cvtMesh.get(), GLTF::TEXTANGENT, 3, asset->profile());
+                        break;
+                    case GLTF::BATCHID:
+                        __ConvertOpenCOLLADAMeshVertexDataToGLTFAccessors(openCOLLADAMesh->getBatchIds(), cvtMesh.get(), GLTF::BATCHID, 1, asset->profile());
                         break;
 
                     default:

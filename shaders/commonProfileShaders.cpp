@@ -604,6 +604,7 @@ namespace GLTF
                 typeForSemanticAttribute["JOINT"] = _GL(FLOAT_VEC4);
                 typeForSemanticAttribute["TEXTANGENT"] = _GL(FLOAT_VEC3);
                 typeForSemanticAttribute["TEXBINORMAL"] = _GL(FLOAT_VEC3);
+                typeForSemanticAttribute["_BATCHID"] = _GL(FLOAT);
             }
             
             return typeForSemanticAttribute[semantic];
@@ -772,7 +773,13 @@ namespace GLTF
                 addSemantic("vs", "attribute",
                             "NORMAL", "normal", 1, true);
             }
-            
+
+            bool hasBatchId = attributeSemantics->contains("_BATCHID");
+            if (hasBatchId) {
+                addSemantic("vs", "attribute",
+                    "_BATCHID", "batchId", 1, false);
+            }
+
             if (hasSkinning) {
                 addSemantic("vs", "attribute",
                             "JOINT", "joint", 1, false);
@@ -933,11 +940,13 @@ namespace GLTF
                     }
                 }
                 
+                shared_ptr <JSONObject> slotParameter;
+
                 if (slotType == vec4Type) {
                     std::string slotColorSymbol = "u_"+slot;
                     fragmentShader->appendCode("%s = %s;\n", slot.c_str(), slotColorSymbol.c_str());
                     
-                    addValue("fs", "uniform",   slotType, 1, slot, asset);
+                    slotParameter = addValue("fs", "uniform",   slotType, 1, slot, asset);
                 } else if (slotType == sampler2DType) {
                     std::string semantic = texcoordBindings->getString(slot);
                     if (semantic.length() == 0) {
@@ -987,12 +996,19 @@ namespace GLTF
                     
                     //get the texture
                     shared_ptr <JSONObject> textureParameter = inputParameters->getObject(slot);
-                    //FIXME:this should eventually not come from the inputParameter
-                    addValue("fs", "uniform", textureParameter->getUnsignedInt32(kType), 1, slot, asset);
                     
                     if ((hasNormalMap == false) && (slot == "bump"))
                         continue;
+                    
+                    //FIXME:this should eventually not come from the inputParameter
+                    slotParameter = addValue("fs", "uniform", textureParameter->getUnsignedInt32(kType), 1, slot, asset);
+                    
                     fragmentShader->appendCode("%s = texture2D(%s, %s);\n", slot.c_str(), textureSymbol.c_str(), texVSymbol.c_str());
+                }
+
+                // Give the diffuse uniform a semantic to support color replacement in 3D Tiles
+                if (slot == "diffuse") {
+                    slotParameter->setString(kSemantic, "_3DTILESDIFFUSE");
                 }
             }
             

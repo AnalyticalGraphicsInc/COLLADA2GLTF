@@ -30,9 +30,6 @@ configure_file("${CMAKE_CURRENT_SOURCE_DIR}/GitSHA1.cpp.in" "${CMAKE_CURRENT_BIN
 
 set(TARGET_LIBS GeneratedSaxParser_static OpenCOLLADABaseUtils_static UTF_static ftoa_static MathMLSolver_static OpenCOLLADASaxFrameworkLoader_static OpenCOLLADAFramework_static buffer_static)
 
-if (NOT WIN32)
-    set(CMAKE_FIND_LIBRARY_SUFFIXES .so .a .dylib)
-endif()
 
 # Lets libxml2 work in a shared library
 add_definitions(-DLIBXML_STATIC_FOR_DLL)
@@ -48,7 +45,12 @@ include_directories(${COLLADA2GLTF_SOURCE_DIR}/shaders)
 include_directories(${COLLADA2GLTF_SOURCE_DIR}/helpers)
 include_directories(${COLLADA2GLTF_SOURCE_DIR}/convert)
 include_directories(${COLLADA2GLTF_SOURCE_DIR}/assetModifiers)
-include_directories(${COLLADA2GLTF_SOURCE_DIR}/dependencies/json/include/rapidjson)
+if (RAPIDJSON_INCLUDE_DIR)
+  include_directories(${RAPIDJSON_INCLUDE_DIR}/rapidjson)
+else()
+  include_directories(${COLLADA2GLTF_SOURCE_DIR}/dependencies/json/include/rapidjson)
+endif()
+
 include_directories(${COLLADA2GLTF_SOURCE_DIR}/dependencies/OpenCOLLADA/OpenCOLLADA/COLLADAFramework/include)
 include_directories(${COLLADA2GLTF_SOURCE_DIR}/dependencies/OpenCOLLADA/OpenCOLLADA/COLLADABaseUtils/include)
 include_directories(${COLLADA2GLTF_SOURCE_DIR}/dependencies/OpenCOLLADA/OpenCOLLADA/COLLADASaxFrameworkLoader/include)
@@ -218,5 +220,9 @@ if (WIN32)
 LIST(APPEND GLTF_EXE_SOURCES ${COLLADA2GLTF_SOURCE_DIR}/dependencies/misc/getopt_long.c ${COLLADA2GLTF_SOURCE_DIR}/dependencies/misc/getopt.c ${COLLADA2GLTF_SOURCE_DIR}/dependencies/misc/getopt.h)
 endif()
 
-add_executable(collada2gltf ${GLTF_EXE_SOURCES})
-target_link_libraries (collada2gltf collada2gltfConvert)
+option(BUILD_EXE "BUILD_EXE" ON)
+if (BUILD_EXE)
+  add_executable(collada2gltf ${GLTF_EXE_SOURCES})
+  target_link_libraries (collada2gltf collada2gltfConvert)
+endif()
+

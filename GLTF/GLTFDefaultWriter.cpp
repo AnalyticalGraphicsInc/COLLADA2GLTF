@@ -46,9 +46,9 @@ namespace GLTF
     bool GLTFDefaultWriter::initWithPath(const std::string &path) {
         this->_fd = fopen(path.c_str(), "w");
         if (this->_fd) {
-            this->_fileStream = new rapidjson::FileStream(this->_fd);
+            this->_fileStream = new rapidjson::FileWriteStream(this->_fd, m_buffer, sizeof(m_buffer));
             if (this->_fileStream) {
-                this->_writer = new rapidjson::PrettyWriter <rapidjson::FileStream>(*this->_fileStream);
+                this->_writer = new rapidjson::PrettyWriter <rapidjson::FileWriteStream>(*this->_fileStream);
                 return this->_writer != 0;
             }
         }

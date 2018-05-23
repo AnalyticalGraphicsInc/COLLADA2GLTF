@@ -96,7 +96,8 @@ namespace GLTF
                     return "TEXBINORMAL";
                 case GLTF::TEXTANGENT:
                     return "TEXTANGENT";
-                    
+                case GLTF::BATCHID:
+                    return "_BATCHID";
                 default:
                     return "UNKNOWN";
             }

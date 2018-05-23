@@ -30,7 +30,7 @@
 #include "GLTFWriter.h"
 
 #include <prettywriter.h>
-#include <filestream.h>
+#include <filewritestream.h>
 
 namespace GLTF
 {
@@ -50,8 +50,9 @@ namespace GLTF
 
     private:
         FILE* _fd;
-        rapidjson::PrettyWriter <rapidjson::FileStream> *_writer;
-        rapidjson::FileStream *_fileStream;
+        rapidjson::PrettyWriter <rapidjson::FileWriteStream> *_writer;
+        rapidjson::FileWriteStream *_fileStream;
+        char m_buffer[65536];
     };
 
 }

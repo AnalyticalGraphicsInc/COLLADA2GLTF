@@ -132,7 +132,8 @@ namespace GLTF
         WEIGHT = 5,
         JOINT = 6,
         TEXTANGENT = 7,
-        TEXBINORMAL = 8
+        TEXBINORMAL = 8,
+        BATCHID = 9
     } Semantic;    
 
     typedef std::string JSONType;
