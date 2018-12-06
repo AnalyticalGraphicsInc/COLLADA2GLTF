@@ -13,8 +13,8 @@ namespace GLTF {
 		int id = -1;
 		std::string stringId;
 		std::string name;
-		std::map<std::string, GLTF::Extension*> extensions;
-		std::map<std::string, GLTF::Object*> extras;
+		std::map<std::string, std::shared_ptr<GLTF::Extension>> extensions;
+		std::map<std::string, std::shared_ptr<GLTF::Object>> extras;
 
 		std::string getStringId();
 		virtual std::string typeName();

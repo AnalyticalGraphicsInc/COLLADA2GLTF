@@ -14,7 +14,7 @@ namespace GLTF {
 	class DracoExtension : public GLTF::Object {
 	public:
 		DracoExtension() : dracoMesh(new draco::Mesh()) {} 
-		GLTF::BufferView* bufferView = NULL;
+		std::shared_ptr<GLTF::BufferView> bufferView = NULL;
 		std::unordered_map<std::string, int> attributeToId;
 		
 		std::unique_ptr<draco::Mesh> dracoMesh;

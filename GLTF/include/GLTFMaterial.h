@@ -19,28 +19,28 @@ namespace GLTF {
 
 		class Values {
 		public:
-			float* ambient = NULL;
-			GLTF::Texture* ambientTexture = NULL;
+            std::shared_ptr<float[]> ambient;
+			std::shared_ptr<GLTF::Texture> ambientTexture;
 			int ambientTexCoord = 0;
-			float* diffuse = NULL;
-			GLTF::Texture* diffuseTexture = NULL;
+            std::shared_ptr<float[]> diffuse;
+			std::shared_ptr<GLTF::Texture> diffuseTexture;
 			int diffuseTexCoord = 0;
-			float* emission = NULL;
-			GLTF::Texture* emissionTexture = NULL;
+            std::shared_ptr<float[]> emission;
+			std::shared_ptr<GLTF::Texture> emissionTexture;
 			int emissionTexCoord = 0;
-			float* specular = NULL;
-			GLTF::Texture* specularTexture = NULL;
+            std::shared_ptr<float[]> specular;
+			std::shared_ptr<GLTF::Texture> specularTexture;
 			int specularTexCoord = 0;
-			float* shininess = NULL;
-			float* transparency = NULL;
-			GLTF::Texture* bumpTexture = NULL;
+            std::shared_ptr<float[]> shininess;
+            std::shared_ptr<float[]> transparency;
+			std::shared_ptr<GLTF::Texture> bumpTexture;
 
 			void writeJSON(void* writer, GLTF::Options* options);
 		};
 
-		GLTF::Technique* technique = NULL;
+		std::shared_ptr<GLTF::Technique> technique;
 		Type type = Type::UNKNOWN;
-		Values* values = NULL;
+		std::shared_ptr<Values> values;
 		bool doubleSided = false;
 
 		Material();
@@ -54,7 +54,7 @@ namespace GLTF {
 		class Texture : public GLTF::Object {
 		public:
 			float scale = 1;
-			GLTF::Texture* texture = NULL;
+			std::shared_ptr<GLTF::Texture> texture;
 			int texCoord = -1;
 
 			void writeJSON(void* writer, GLTF::Options* options);
@@ -62,32 +62,32 @@ namespace GLTF {
 
 		class MetallicRoughness : public GLTF::Object {
 		public:
-			float* baseColorFactor = NULL;
-			Texture* baseColorTexture = NULL;
+            std::shared_ptr<float[]> baseColorFactor;
+			std::shared_ptr<Texture> baseColorTexture;
 			float metallicFactor = -1.0;
 			float roughnessFactor = -1.0;
-			Texture* metallicRoughnessTexture = NULL;
+			std::shared_ptr<Texture> metallicRoughnessTexture;
 
 			void writeJSON(void* writer, GLTF::Options* options);
 		};
 
 		class SpecularGlossiness : public GLTF::Object {
 		public:
-			float* diffuseFactor = NULL;
-			Texture* diffuseTexture = NULL;
-			float* specularFactor = NULL;
-			Texture* specularGlossinessTexture = NULL;
-			float* glossinessFactor = NULL;
+            std::shared_ptr<float[]> diffuseFactor;
+			std::shared_ptr<Texture> diffuseTexture;
+            std::shared_ptr<float[]> specularFactor;
+			std::shared_ptr<Texture> specularGlossinessTexture;
+            std::shared_ptr<float[]> glossinessFactor;
 
 			void writeJSON(void* writer, GLTF::Options* options);
 		};
 
-		MetallicRoughness* metallicRoughness = NULL;
-		Texture* normalTexture = NULL;
-		Texture* occlusionTexture = NULL;
-		float* emissiveFactor = NULL;
-		Texture* emissiveTexture = NULL;
-		SpecularGlossiness* specularGlossiness = NULL;
+		std::shared_ptr<MetallicRoughness> metallicRoughness;
+		std::shared_ptr<Texture> normalTexture;
+		std::shared_ptr<Texture> occlusionTexture;
+        std::shared_ptr<float[]> emissiveFactor;
+		std::shared_ptr<Texture> emissiveTexture;
+		std::shared_ptr<SpecularGlossiness> specularGlossiness;
 
 		/** Either "OPAQUE", "BLEND" or "MASK". Default = "OPAQUE" */
 		std::string alphaMode;
@@ -126,7 +126,7 @@ namespace GLTF {
 			float constantAttenuation;
 			float linearAttenuation;
 			float quadraticAttenuation;
-			void* node = NULL;
+			std::weak_ptr<GLTF::Node> node;
 
 			virtual std::string typeName();
 			virtual void writeJSON(void* writer, GLTF::Options* options);
@@ -139,10 +139,10 @@ namespace GLTF {
 
 		MaterialCommon();
 		const char* getTechniqueName();
-		GLTF::Material* getMaterial(std::vector<GLTF::MaterialCommon::Light*> lights, GLTF::Options* options);
-		GLTF::Material* getMaterial(std::vector<GLTF::MaterialCommon::Light*> lights, bool hasColorAttribute, GLTF::Options* options);
+		std::shared_ptr<GLTF::Material> getMaterial(std::vector<std::shared_ptr<GLTF::MaterialCommon::Light>> lights, GLTF::Options* options);
+        std::shared_ptr<GLTF::Material> getMaterial(std::vector<std::shared_ptr<GLTF::MaterialCommon::Light>> lights, bool hasColorAttribute, GLTF::Options* options);
 		std::string getTechniqueKey(GLTF::Options* options);
-		GLTF::MaterialPBR* getMaterialPBR(GLTF::Options* options);
+        std::shared_ptr<GLTF::MaterialPBR> getMaterialPBR(GLTF::Options* options);
 		virtual void writeJSON(void* writer, GLTF::Options* options);
 	};
 }

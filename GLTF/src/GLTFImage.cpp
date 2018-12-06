@@ -7,7 +7,7 @@
 #include "rapidjson/stringbuffer.h"
 #include "rapidjson/writer.h"
 
-std::map<std::string, GLTF::Image*> _imageCache;
+std::map<std::string, std::shared_ptr<GLTF::Image>> _imageCache;
 
 GLTF::Image::Image(std::string uri, std::string cacheKey) : uri(uri), cacheKey(cacheKey) {}
 
@@ -32,10 +32,12 @@ GLTF::Image::~Image() {
 	if (!cacheKey.empty()) {
 		_imageCache.erase(cacheKey);
 	}
+
+    delete[] data;
 }
 
-GLTF::Image* GLTF::Image::load(std::string imagePath) {
-	std::map<std::string, GLTF::Image*>::iterator imageCacheIt = _imageCache.find(imagePath);
+std::shared_ptr<GLTF::Image> GLTF::Image::load(std::string imagePath) {
+	auto imageCacheIt = _imageCache.find(imagePath);
 	if (imageCacheIt != _imageCache.end()) {
 		return imageCacheIt->second;
 	}
@@ -55,21 +57,21 @@ GLTF::Image* GLTF::Image::load(std::string imagePath) {
 		fileName = imagePath.substr(lastSlash + 1);
 	}
 
-	GLTF::Image* image = NULL;
+    std::shared_ptr<GLTF::Image> image;
 	FILE* file = fopen(imagePath.c_str(), "rb");
 	if (file == NULL) {
 		std::cout << "WARNING: Image uri: " << imagePath << " could not be resolved " << std::endl;
-		image = new GLTF::Image(fileName, imagePath);
+		image = std::make_shared<GLTF::Image>(fileName, imagePath);
 	}
 	else {
 		fseek(file, 0, SEEK_END);
 		long int size = ftell(file);
 		fclose(file);
 		file = fopen(imagePath.c_str(), "rb");
-		unsigned char* buffer = (unsigned char*)malloc(size);
+		unsigned char* buffer = new unsigned char[size];
 		int bytesRead = fread(buffer, sizeof(unsigned char), size, file);
 		fclose(file);
-		image = new GLTF::Image(fileName, imagePath, buffer, bytesRead, fileExtension);
+		image = std::make_shared<GLTF::Image>(fileName, imagePath, buffer, bytesRead, fileExtension);
 	}
 	_imageCache[imagePath] = image;
 	return image;

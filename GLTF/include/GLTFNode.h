@@ -54,14 +54,14 @@ namespace GLTF {
 			TransformMatrix* getTransformMatrix();
 		};
 
-		GLTF::Camera* camera = NULL;
-		std::vector<GLTF::Node*> children;
-		GLTF::Skin* skin = NULL;
+		std::shared_ptr<GLTF::Camera> camera;
+		std::vector<std::shared_ptr<GLTF::Node>> children;
+		std::shared_ptr<GLTF::Skin> skin;
 		std::string jointName;
-		GLTF::Mesh* mesh = NULL;
-		GLTF::MaterialCommon::Light* light = NULL;
+		std::shared_ptr<GLTF::Mesh> mesh;
+		std::shared_ptr<GLTF::MaterialCommon::Light> light;
 
-		Transform* transform = NULL;
+		std::shared_ptr<Transform> transform;
 
 		virtual std::string typeName();
 		virtual GLTF::Object* clone(GLTF::Object* clone);

@@ -14,7 +14,7 @@
 namespace GLTF {
 	class Asset : public GLTF::Object {
 	private:
-		std::vector<GLTF::MaterialCommon::Light*> _ambientLights;
+		std::vector<std::shared_ptr<GLTF::MaterialCommon::Light>> _ambientLights;
 	public:
 		class Metadata : public GLTF::Object {
 		public:
@@ -24,37 +24,37 @@ namespace GLTF {
 			virtual void writeJSON(void* writer, GLTF::Options* options);
 		};
 
-		GLTF::Sampler* globalSampler = NULL;
+		std::shared_ptr<GLTF::Sampler> globalSampler;
 
 		Metadata* metadata = NULL;
 		std::set<std::string> extensionsUsed;
 		std::set<std::string> extensionsRequired;
 
-		std::vector<GLTF::Scene*> scenes;
-		std::vector<GLTF::Animation*> animations;
+		std::vector<std::shared_ptr<GLTF::Scene>> scenes;
+		std::vector<std::shared_ptr<GLTF::Animation>> animations;
 		int scene = -1;
 
 		Asset();
-		GLTF::Scene* getDefaultScene();
-		std::vector<GLTF::Accessor*> getAllAccessors();
-		std::vector<GLTF::Node*> getAllNodes();
-		std::vector<GLTF::Mesh*> getAllMeshes();
-		std::vector<GLTF::Primitive*> getAllPrimitives();
-		std::vector<GLTF::Skin*> getAllSkins();
-		std::vector<GLTF::Material*> getAllMaterials();
-		std::vector<GLTF::Technique*> getAllTechniques();
-		std::vector<GLTF::Program*> getAllPrograms();
-		std::vector<GLTF::Shader*> getAllShaders();
-		std::vector<GLTF::Texture*> getAllTextures();
-		std::vector<GLTF::Image*> getAllImages();
-		std::vector<GLTF::Accessor*> getAllPrimitiveAccessors(GLTF::Primitive* primitive) const;
+		std::shared_ptr<GLTF::Scene> getDefaultScene();
+		std::vector<std::shared_ptr<GLTF::Accessor>> getAllAccessors();
+		std::vector<std::shared_ptr<GLTF::Node>> getAllNodes();
+		std::vector<std::shared_ptr<GLTF::Mesh>> getAllMeshes();
+		std::vector<std::shared_ptr<GLTF::Primitive>> getAllPrimitives();
+		std::vector<std::shared_ptr<GLTF::Skin>> getAllSkins();
+		std::vector<std::shared_ptr<GLTF::Material>> getAllMaterials();
+		std::vector<std::shared_ptr<GLTF::Technique>> getAllTechniques();
+		std::vector<std::shared_ptr<GLTF::Program>> getAllPrograms();
+		std::vector<std::shared_ptr<GLTF::Shader>> getAllShaders();
+		std::vector<std::shared_ptr<GLTF::Texture>> getAllTextures();
+		std::vector<std::shared_ptr<GLTF::Image>> getAllImages();
+		std::vector<std::shared_ptr<GLTF::Accessor>> getAllPrimitiveAccessors(GLTF::Primitive* primitive) const;
 		void mergeAnimations();
 		void removeUnusedSemantics();
 		void removeUnusedNodes(GLTF::Options* options);
-		GLTF::Buffer* packAccessors();
+		std::shared_ptr<GLTF::Buffer> packAccessors();
 
 		// Functions for Draco compression extension.
-		std::vector<GLTF::BufferView*> getAllCompressedBufferView();
+		std::vector<std::shared_ptr<GLTF::BufferView>> getAllCompressedBufferView();
 		bool compressPrimitives(GLTF::Options* options);
 		void removeUncompressedBufferViews();
 		void removeAttributeFromDracoExtension(GLTF::Primitive* primitive, const std::string &semantic);

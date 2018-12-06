@@ -7,7 +7,7 @@
 namespace GLTF {
 	class BufferView : public GLTF::Object {
 	public:
-		GLTF::Buffer* buffer = NULL;
+		std::shared_ptr<GLTF::Buffer> buffer;
 		int byteOffset = 0;
 		int byteStride = 0;
 		int byteLength = 0;

@@ -20,9 +20,9 @@ namespace GLTF {
 
 	class Sampler : public GLTF::Object {
 	public:
-		GLTF::Accessor* input;
+		std::shared_ptr<GLTF::Accessor> input;
 		std::string interpolation = "LINEAR";
-		GLTF::Accessor* output;
+		std::shared_ptr<GLTF::Accessor> output;
 		std::string inputString;
 		std::string outputString;
 		Path path;
@@ -35,19 +35,19 @@ namespace GLTF {
     public:
 		class Target : public GLTF::Object {
 		public:
-			GLTF::Node* node;
+			std::shared_ptr<GLTF::Node> node;
 			Path path;
 
 			virtual void writeJSON(void* writer, GLTF::Options* options);
 		};
 
-		GLTF::Animation::Sampler* sampler;
-		Target* target;
+		std::shared_ptr<GLTF::Animation::Sampler> sampler;
+		std::shared_ptr<Target> target;
 
 		virtual void writeJSON(void* writer, GLTF::Options* options);
     };
 
-    std::vector<Channel*> channels;
+    std::vector<std::shared_ptr<Channel>> channels;
 
 	virtual std::string typeName();
 	virtual void writeJSON(void* writer, GLTF::Options* options);

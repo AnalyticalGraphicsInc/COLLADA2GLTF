@@ -24,14 +24,14 @@ namespace GLTF {
 			Parameter(std::string semantic, GLTF::Constants::WebGL type, int count) : semantic(semantic), type(type), count(count) {};
 		};
 
-		std::map<std::string, Parameter*> parameters;
+		std::map<std::string, std::shared_ptr<Parameter>> parameters;
 		std::map<std::string, std::string> attributes;
 		std::map<std::string, std::string> uniforms;
 		std::set<GLTF::Constants::WebGL> enableStates;
 		std::vector<GLTF::Constants::WebGL> blendEquationSeparate;
 		std::vector<GLTF::Constants::WebGL> blendFuncSeparate;
 		bool* depthMask = NULL;
-		GLTF::Program* program = NULL;
+		std::shared_ptr<GLTF::Program> program = NULL;
 
 		virtual std::string typeName();
 		virtual void writeJSON(void* writer, GLTF::Options* options);

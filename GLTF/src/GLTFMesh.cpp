@@ -10,7 +10,7 @@ std::string GLTF::Mesh::typeName() {
 GLTF::Object* GLTF::Mesh::clone(GLTF::Object* clone) {
 	GLTF::Mesh* mesh = dynamic_cast<GLTF::Mesh*>(clone);
 	if (mesh != NULL) {
-		for (GLTF::Primitive* primitive : this->primitives) {
+		for (auto& primitive : this->primitives) {
 			GLTF::Primitive* clonePrimitive = new GLTF::Primitive();
 			primitive->clone(clonePrimitive);
 			if (clonePrimitive != NULL) {

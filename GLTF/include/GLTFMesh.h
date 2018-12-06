@@ -8,7 +8,7 @@
 namespace GLTF {
 	class Mesh : public GLTF::Object {
 	public:
-		std::vector<GLTF::Primitive*> primitives;
+		std::vector<std::shared_ptr<GLTF::Primitive>> primitives;
 		std::vector<float> weights;
 
 		virtual std::string typeName();

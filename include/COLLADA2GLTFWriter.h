@@ -14,41 +14,41 @@
 namespace COLLADA2GLTF {
 	class Writer : public COLLADAFW::IWriter {
 	private:
-		GLTF::Asset* _asset;
-		COLLADA2GLTF::Options* _options;
-		COLLADA2GLTF::ExtrasHandler* _extrasHandler;
-		GLTF::Node* _rootNode = NULL;
+		std::shared_ptr<GLTF::Asset> _asset;
+        std::shared_ptr<COLLADA2GLTF::Options> _options;
+        std::shared_ptr<COLLADA2GLTF::ExtrasHandler> _extrasHandler;
+		std::shared_ptr<GLTF::Node> _rootNode = NULL;
 		float _assetScale;
 		std::map<COLLADAFW::UniqueId, COLLADAFW::UniqueId> _materialEffects;
-		std::map<COLLADAFW::UniqueId, GLTF::Material*> _effectInstances;
-		std::map<COLLADAFW::UniqueId, GLTF::Camera*> _cameraInstances;
-		std::map<COLLADAFW::UniqueId, GLTF::Mesh*> _meshInstances;
-		std::map<COLLADAFW::UniqueId, GLTF::Node*> _nodeInstances;
-		std::map<COLLADAFW::UniqueId, std::vector<GLTF::Node*>> _nodeInstanceTargets;
-		std::map<COLLADAFW::UniqueId, std::map<int, std::set<GLTF::Primitive*>>> _meshMaterialPrimitiveMapping;
-		std::map<COLLADAFW::UniqueId, GLTF::MaterialCommon::Light*> _lightInstances;
-		std::map<COLLADAFW::UniqueId, std::map<GLTF::Primitive*, std::vector<unsigned int>>> _meshPositionMapping;
-		std::map<GLTF::Mesh*, std::map<unsigned int, unsigned int>> _meshTexCoordSetMapping;
-		std::map<COLLADAFW::UniqueId, GLTF::Skin*> _skinInstances;
-		std::map<COLLADAFW::UniqueId, GLTF::Node*> _animatedNodes;
+		std::map<COLLADAFW::UniqueId, std::shared_ptr<GLTF::Material>> _effectInstances;
+		std::map<COLLADAFW::UniqueId, std::shared_ptr<GLTF::Camera>> _cameraInstances;
+		std::map<COLLADAFW::UniqueId, std::shared_ptr<GLTF::Mesh>> _meshInstances;
+		std::map<COLLADAFW::UniqueId, std::shared_ptr<GLTF::Node>> _nodeInstances;
+		std::map<COLLADAFW::UniqueId, std::vector<std::shared_ptr<GLTF::Node>>> _nodeInstanceTargets;
+		std::map<COLLADAFW::UniqueId, std::map<int, std::set<std::shared_ptr<GLTF::Primitive>>>> _meshMaterialPrimitiveMapping;
+		std::map<COLLADAFW::UniqueId, std::shared_ptr<GLTF::MaterialCommon::Light>> _lightInstances;
+		std::map<COLLADAFW::UniqueId, std::map<std::shared_ptr<GLTF::Primitive>, std::vector<unsigned int>>> _meshPositionMapping;
+		std::map<std::shared_ptr<GLTF::Mesh>, std::map<unsigned int, unsigned int>> _meshTexCoordSetMapping;
+		std::map<COLLADAFW::UniqueId, std::shared_ptr<GLTF::Skin>> _skinInstances;
+		std::map<COLLADAFW::UniqueId, std::shared_ptr<GLTF::Node>> _animatedNodes;
 		std::map<COLLADAFW::UniqueId, float> _originalRotationAngles;
-		std::map<std::string, std::vector<GLTF::Node*>*> _unboundSkeletonNodes;
-		std::map<std::string, GLTF::Node*> _nodes;
+		std::map<std::string, std::vector<std::shared_ptr<GLTF::Node>>*> _unboundSkeletonNodes;
+		std::map<std::string, std::shared_ptr<GLTF::Node>> _nodes;
 		std::map<COLLADAFW::UniqueId, std::vector<COLLADAFW::UniqueId>> _skinJointNodes;
 		std::map<COLLADAFW::UniqueId, std::tuple<GLTF::Accessor::Type, std::vector<int*>, std::vector<float*>>> _skinData;
-		std::map<COLLADAFW::UniqueId, GLTF::Mesh*> _skinnedMeshes;
-		std::map<COLLADAFW::UniqueId, GLTF::Image*> _images;
+		std::map<COLLADAFW::UniqueId, std::shared_ptr<GLTF::Mesh>> _skinnedMeshes;
+		std::map<COLLADAFW::UniqueId, std::shared_ptr<GLTF::Image>> _images;
 		std::map<COLLADAFW::UniqueId, std::tuple<std::vector<float>, std::vector<float>>> _animationData;
-		std::map<COLLADAFW::UniqueId, std::map<std::string, GLTF::Texture*>> _effectTextureMapping;
+		std::map<COLLADAFW::UniqueId, std::map<std::string, std::shared_ptr<GLTF::Texture>>> _effectTextureMapping;
 		std::map<COLLADAFW::UniqueId, COLLADAFW::UniqueId> _meshMorphTargets;
 
-		bool writeNodeToGroup(std::vector<GLTF::Node*>* group, const COLLADAFW::Node* node);
-		bool writeNodesToGroup(std::vector<GLTF::Node*>* group, const COLLADAFW::NodePointerArray& nodes);
-		GLTF::Texture* fromColladaTexture(const COLLADAFW::EffectCommon* effectCommon, COLLADAFW::SamplerID samplerId);
-		GLTF::Texture* fromColladaTexture(const COLLADAFW::EffectCommon* effectCommon, COLLADAFW::Texture texture);
+		bool writeNodeToGroup(std::vector<std::shared_ptr<GLTF::Node>>* group, const COLLADAFW::Node* node);
+		bool writeNodesToGroup(std::vector<std::shared_ptr<GLTF::Node>>* group, const COLLADAFW::NodePointerArray& nodes);
+		std::shared_ptr<GLTF::Texture> fromColladaTexture(const COLLADAFW::EffectCommon* effectCommon, COLLADAFW::SamplerID samplerId);
+		std::shared_ptr<GLTF::Texture> fromColladaTexture(const COLLADAFW::EffectCommon* effectCommon, COLLADAFW::Texture texture);
 
 	public:
-		Writer(GLTF::Asset* asset, COLLADA2GLTF::Options* options, COLLADA2GLTF::ExtrasHandler* handler);
+		Writer(std::shared_ptr<GLTF::Asset>& asset, std::shared_ptr<COLLADA2GLTF::Options>& options, std::shared_ptr<COLLADA2GLTF::ExtrasHandler>& handler);
 
 		/** Deletes the entire scene.
 			 @param errorMessage A message containing informations about the error that occurred.

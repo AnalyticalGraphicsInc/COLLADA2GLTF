@@ -20,7 +20,7 @@ namespace GLTF {
 			UNKNOWN
 		};
 
-		GLTF::BufferView* bufferView = NULL;
+		std::shared_ptr<GLTF::BufferView> bufferView = NULL;
 		int byteOffset = 0;
 		GLTF::Constants::WebGL componentType;
 		int count = 0;

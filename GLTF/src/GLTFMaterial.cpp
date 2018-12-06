@@ -5,7 +5,7 @@
 #include "rapidjson/writer.h"
 
 GLTF::Material::Material() {
-	this->values = new GLTF::Material::Values();
+	this->values = std::make_shared<GLTF::Material::Values>();
 	this->type = GLTF::Material::MATERIAL;
 }
 
@@ -332,7 +332,7 @@ void GLTF::MaterialCommon::Light::writeJSON(void* writer, GLTF::Options* options
 }
 
 GLTF::MaterialCommon::MaterialCommon() {
-	this->values = new GLTF::Material::Values();
+	this->values = std::make_shared<GLTF::Material::Values>();
 	this->type = GLTF::Material::MATERIAL_COMMON;
 }
 
@@ -350,22 +350,22 @@ const char* GLTF::MaterialCommon::getTechniqueName() {
 	return NULL;
 }
 
-GLTF::Material* GLTF::MaterialCommon::getMaterial(std::vector<GLTF::MaterialCommon::Light*> lights, GLTF::Options* options) {
+std::shared_ptr<GLTF::Material> GLTF::MaterialCommon::getMaterial(std::vector<std::shared_ptr<GLTF::MaterialCommon::Light>> lights, GLTF::Options* options) {
 	return getMaterial(lights, false, options);
 }
 
-GLTF::Material* GLTF::MaterialCommon::getMaterial(std::vector<GLTF::MaterialCommon::Light*> lights, bool hasColor, GLTF::Options* options) {
-	GLTF::Material* material = new GLTF::Material();
+std::shared_ptr<GLTF::Material> GLTF::MaterialCommon::getMaterial(std::vector<std::shared_ptr<GLTF::MaterialCommon::Light>> lights, bool hasColor, GLTF::Options* options) {
+	auto material = std::make_shared<GLTF::Material>();
 	material->values = values;
 	material->name = name;
 	material->stringId = stringId;
-	GLTF::Technique* technique = new GLTF::Technique();
+	auto technique = std::make_shared<GLTF::Technique>();
 	material->technique = technique;
-	GLTF::Program* program = new GLTF::Program();
+    auto program = std::make_shared<GLTF::Program>();
 	technique->program = program;
-	GLTF::Shader* fragmentShader = new GLTF::Shader();
+    auto fragmentShader = std::make_shared<GLTF::Shader>();
 	program->fragmentShader = fragmentShader;
-	GLTF::Shader* vertexShader = new GLTF::Shader();
+    auto vertexShader = std::make_shared<GLTF::Shader>();
 	program->vertexShader = vertexShader;
 
 	bool hasNormals = this->technique != GLTF::MaterialCommon::Technique::CONSTANT;
@@ -376,75 +376,75 @@ GLTF::Material* GLTF::MaterialCommon::getMaterial(std::vector<GLTF::MaterialComm
 	std::string fragmentShaderSource = "precision highp float;\n";
 
 	// Add matrices
-	technique->parameters["modelViewMatrix"] = new GLTF::Technique::Parameter("MODELVIEW", GLTF::Constants::WebGL::FLOAT_MAT4);
+	technique->parameters["modelViewMatrix"] = std::make_shared<GLTF::Technique::Parameter>("MODELVIEW", GLTF::Constants::WebGL::FLOAT_MAT4);
 	technique->uniforms["u_modelViewMatrix"] = "modelViewMatrix";
 	vertexShaderSource += "uniform mat4 u_modelViewMatrix;\n";
-	technique->parameters["projectionMatrix"] = new GLTF::Technique::Parameter("PROJECTION", GLTF::Constants::WebGL::FLOAT_MAT4);
+	technique->parameters["projectionMatrix"] = std::make_shared<GLTF::Technique::Parameter>("PROJECTION", GLTF::Constants::WebGL::FLOAT_MAT4);
 	technique->uniforms["u_projectionMatrix"] = "projectionMatrix";
 	vertexShaderSource += "uniform mat4 u_projectionMatrix;\n";
 	if (hasNormals) {
-		technique->parameters["normalMatrix"] = new GLTF::Technique::Parameter("MODELVIEWINVERSETRANSPOSE", GLTF::Constants::WebGL::FLOAT_MAT3);
+		technique->parameters["normalMatrix"] = std::make_shared<GLTF::Technique::Parameter>("MODELVIEWINVERSETRANSPOSE", GLTF::Constants::WebGL::FLOAT_MAT3);
 		technique->uniforms["u_normalMatrix"] = "normalMatrix";
 		vertexShaderSource += "uniform mat3 u_normalMatrix;\n";
 	}
 	if (hasSkinning) {
-		technique->parameters["jointMatrix"] = new GLTF::Technique::Parameter("JOINTMATRIX", GLTF::Constants::WebGL::FLOAT_MAT4, jointCount);
+		technique->parameters["jointMatrix"] = std::make_shared<GLTF::Technique::Parameter>("JOINTMATRIX", GLTF::Constants::WebGL::FLOAT_MAT4, jointCount);
 		technique->uniforms["u_jointMatrix"] = "jointMatrix";
 		vertexShaderSource += "uniform mat4 u_jointMatrix[" + std::to_string(jointCount) + "];\n";
 	}
 	
 	// Add parameters and uniforms from values
 	if (values->ambient != NULL) {
-		technique->parameters["ambient"] = new GLTF::Technique::Parameter(GLTF::Constants::WebGL::FLOAT_VEC4);
+		technique->parameters["ambient"] = std::make_shared<GLTF::Technique::Parameter>(GLTF::Constants::WebGL::FLOAT_VEC4);
 		technique->uniforms["u_ambient"] = "ambient";
 		fragmentShaderSource += "uniform vec4 u_ambient;\n";
 	}
 	else if (values->ambientTexture != NULL) {
-		technique->parameters["ambient"] = new GLTF::Technique::Parameter(GLTF::Constants::WebGL::SAMPLER_2D);
+		technique->parameters["ambient"] = std::make_shared<GLTF::Technique::Parameter>(GLTF::Constants::WebGL::SAMPLER_2D);
 		technique->uniforms["u_ambient"] = "ambient";
 		fragmentShaderSource += "uniform sampler2D u_ambient;\n";
 		hasTexture = true;
 	}
 	if (values->diffuse != NULL) {
-		technique->parameters["diffuse"] = new GLTF::Technique::Parameter(GLTF::Constants::WebGL::FLOAT_VEC4);
+		technique->parameters["diffuse"] = std::make_shared<GLTF::Technique::Parameter>(GLTF::Constants::WebGL::FLOAT_VEC4);
 		technique->uniforms["u_diffuse"] = "diffuse";
 		fragmentShaderSource += "uniform vec4 u_diffuse;\n";
 	}
 	else if (values->diffuseTexture != NULL) {
-		technique->parameters["diffuse"] = new GLTF::Technique::Parameter(GLTF::Constants::WebGL::SAMPLER_2D);
+		technique->parameters["diffuse"] = std::make_shared<GLTF::Technique::Parameter>(GLTF::Constants::WebGL::SAMPLER_2D);
 		technique->uniforms["u_diffuse"] = "diffuse";
 		fragmentShaderSource += "uniform sampler2D u_diffuse;\n";
 		hasTexture = true;
 	}
 	if (values->emission != NULL) {
-		technique->parameters["emission"] = new GLTF::Technique::Parameter(GLTF::Constants::WebGL::FLOAT_VEC4);
+		technique->parameters["emission"] = std::make_shared<GLTF::Technique::Parameter>(GLTF::Constants::WebGL::FLOAT_VEC4);
 		technique->uniforms["u_emission"] = "emission";
 		fragmentShaderSource += "uniform vec4 u_emission;\n";
 	}
 	else if (values->emissionTexture != NULL) {
-		technique->parameters["emission"] = new GLTF::Technique::Parameter(GLTF::Constants::WebGL::SAMPLER_2D);
+		technique->parameters["emission"] = std::make_shared<GLTF::Technique::Parameter>(GLTF::Constants::WebGL::SAMPLER_2D);
 		technique->uniforms["u_emission"] = "emission";
 		fragmentShaderSource += "uniform sampler2D u_emission;\n";
 		hasTexture = true;
 	}
 	if (values->specular != NULL) {
-		technique->parameters["specular"] = new GLTF::Technique::Parameter(GLTF::Constants::WebGL::FLOAT_VEC4);
+		technique->parameters["specular"] = std::make_shared<GLTF::Technique::Parameter>(GLTF::Constants::WebGL::FLOAT_VEC4);
 		technique->uniforms["u_specular"] = "specular";
 		fragmentShaderSource += "uniform vec4 u_specular;\n";
 	}
 	else if (values->specularTexture != NULL) {
-		technique->parameters["specular"] = new GLTF::Technique::Parameter(GLTF::Constants::WebGL::SAMPLER_2D);
+		technique->parameters["specular"] = std::make_shared<GLTF::Technique::Parameter>(GLTF::Constants::WebGL::SAMPLER_2D);
 		technique->uniforms["u_specular"] = "specular";
 		fragmentShaderSource += "uniform sampler2D u_specular;\n";
 		hasTexture = true;
 	}
 	if (values->shininess != NULL) {
-		technique->parameters["shininess"] = new GLTF::Technique::Parameter(GLTF::Constants::WebGL::FLOAT);
+		technique->parameters["shininess"] = std::make_shared<GLTF::Technique::Parameter>(GLTF::Constants::WebGL::FLOAT);
 		technique->uniforms["u_shininess"] = "shininess";
 		fragmentShaderSource += "uniform float u_shininess;\n";
 	}
 	if (values->transparency != NULL) {
-		technique->parameters["transparency"] = new GLTF::Technique::Parameter(GLTF::Constants::WebGL::FLOAT);
+		technique->parameters["transparency"] = std::make_shared<GLTF::Technique::Parameter>(GLTF::Constants::WebGL::FLOAT);
 		technique->uniforms["u_transparency"] = "transparency";
 		fragmentShaderSource += "uniform float u_transparency;\n";
 	}
@@ -453,10 +453,10 @@ GLTF::Material* GLTF::MaterialCommon::getMaterial(std::vector<GLTF::MaterialComm
 	std::map<std::string, GLTF::MaterialCommon::Light::Type> nonAmbientLights;
 	// Add parameters and uniforms from lights
 	for (size_t i = 0; i < lights.size(); i++) {
-		GLTF::MaterialCommon::Light* light = lights[i];
+		auto light = lights[i];
 		std::string name = "light" + std::to_string(i);
 		std::string colorName = name + "Color";
-		technique->parameters[colorName] = new GLTF::Technique::Parameter(GLTF::Constants::WebGL::FLOAT_VEC3, light->color, 3);
+		technique->parameters[colorName] = std::make_shared<GLTF::Technique::Parameter>(GLTF::Constants::WebGL::FLOAT_VEC3, light->color, 3);
 		technique->uniforms["u_" + colorName] = colorName;
 		fragmentShaderSource += "uniform vec3 u_" + colorName + ";\n";
 		if (light->type == Light::AMBIENT) {
@@ -464,10 +464,10 @@ GLTF::Material* GLTF::MaterialCommon::getMaterial(std::vector<GLTF::MaterialComm
 		}
 		else {
 			nonAmbientLights[name] = light->type;
-			if (light->node != NULL) {
-				GLTF::Node* node = (GLTF::Node*)light->node;
+            auto node = light->node.lock();
+			if (node != NULL) {
 				std::string transformName = name + "Transform";
-				GLTF::Technique::Parameter* nodeTransform = new GLTF::Technique::Parameter("MODELVIEW", GLTF::Constants::WebGL::FLOAT_MAT4);
+				auto nodeTransform = std::make_shared<GLTF::Technique::Parameter>("MODELVIEW", GLTF::Constants::WebGL::FLOAT_MAT4);
 				nodeTransform->node = node->id;
 				nodeTransform->nodeString = node->getStringId();
 				technique->parameters[transformName] = nodeTransform;
@@ -479,7 +479,7 @@ GLTF::Material* GLTF::MaterialCommon::getMaterial(std::vector<GLTF::MaterialComm
 					attenuation[0] = light->constantAttenuation;
 					attenuation[1] = light->linearAttenuation;
 					attenuation[2] = light->quadraticAttenuation;
-					technique->parameters[attenuationName] = new GLTF::Technique::Parameter(GLTF::Constants::WebGL::FLOAT_VEC3, attenuation, 3);
+					technique->parameters[attenuationName] = std::make_shared<GLTF::Technique::Parameter>(GLTF::Constants::WebGL::FLOAT_VEC3, attenuation, 3);
 					technique->uniforms["u_" + attenuationName] = attenuationName;
 					fragmentShaderSource += "uniform vec3 u_" + attenuationName + ";\n";
 				}
@@ -488,29 +488,29 @@ GLTF::Material* GLTF::MaterialCommon::getMaterial(std::vector<GLTF::MaterialComm
 	}
 
 	// Add parameters and attributes
-	technique->parameters["position"] = new GLTF::Technique::Parameter("POSITION", GLTF::Constants::WebGL::FLOAT_VEC3);
+	technique->parameters["position"] = std::make_shared<GLTF::Technique::Parameter>("POSITION", GLTF::Constants::WebGL::FLOAT_VEC3);
 	technique->attributes["a_position"] = "position";
 	program->attributes.insert("a_position");
 	if (hasNormals) {
-		technique->parameters["normal"] = new GLTF::Technique::Parameter("NORMAL", GLTF::Constants::WebGL::FLOAT_VEC3);
+		technique->parameters["normal"] = std::make_shared<GLTF::Technique::Parameter>("NORMAL", GLTF::Constants::WebGL::FLOAT_VEC3);
 		technique->attributes["a_normal"] = "normal";
 		program->attributes.insert("a_normal");
 	}
 	if (hasTexture) {
-		technique->parameters["texcoord0"] = new GLTF::Technique::Parameter("TEXCOORD_0", GLTF::Constants::WebGL::FLOAT_VEC3);
+		technique->parameters["texcoord0"] = std::make_shared<GLTF::Technique::Parameter>("TEXCOORD_0", GLTF::Constants::WebGL::FLOAT_VEC3);
 		technique->attributes["a_texcoord0"] = "texcoord0";
 		program->attributes.insert("a_texcoord0");
 	}
 	if (hasColor) {
-		technique->parameters["color0"] = new GLTF::Technique::Parameter("COLOR_0", GLTF::Constants::WebGL::FLOAT_VEC3);
+		technique->parameters["color0"] = std::make_shared<GLTF::Technique::Parameter>("COLOR_0", GLTF::Constants::WebGL::FLOAT_VEC3);
 		technique->attributes["a_color0"] = "color0";
 		program->attributes.insert("a_color0");
 	}
 	if (hasSkinning) {
-		technique->parameters["joint"] = new GLTF::Technique::Parameter("JOINT", GLTF::Constants::WebGL::FLOAT_VEC4);
+		technique->parameters["joint"] = std::make_shared<GLTF::Technique::Parameter>("JOINT", GLTF::Constants::WebGL::FLOAT_VEC4);
 		technique->attributes["a_joint"] = "joint";
 		program->attributes.insert("a_joint");
-		technique->parameters["weight"] = new GLTF::Technique::Parameter("WEIGHT", GLTF::Constants::WebGL::FLOAT_VEC4);
+		technique->parameters["weight"] = std::make_shared<GLTF::Technique::Parameter>("WEIGHT", GLTF::Constants::WebGL::FLOAT_VEC4);
 		technique->attributes["a_weight"] = "weight";
 		program->attributes.insert("a_weight");
 	}
@@ -852,12 +852,12 @@ std::string GLTF::MaterialCommon::getTechniqueKey(GLTF::Options* options) {
 
 GLTF::MaterialPBR::MaterialPBR() {
 	this->type = GLTF::Material::PBR_METALLIC_ROUGHNESS;
-	this->metallicRoughness = new GLTF::MaterialPBR::MetallicRoughness();
-	this->specularGlossiness = new GLTF::MaterialPBR::SpecularGlossiness();
+	this->metallicRoughness = std::make_shared<GLTF::MaterialPBR::MetallicRoughness>();
+	this->specularGlossiness = std::make_shared<GLTF::MaterialPBR::SpecularGlossiness>();
 }
 
-GLTF::MaterialPBR* GLTF::MaterialCommon::getMaterialPBR(GLTF::Options* options) {
-	GLTF::MaterialPBR* material = new GLTF::MaterialPBR();
+std::shared_ptr<GLTF::MaterialPBR> GLTF::MaterialCommon::getMaterialPBR(GLTF::Options* options) {
+	auto material = std::make_shared<GLTF::MaterialPBR>();
 	material->metallicRoughness->metallicFactor = 0;
 	bool hasTransparency = false;
 	if (values->diffuse) {	
@@ -870,7 +870,7 @@ GLTF::MaterialPBR* GLTF::MaterialCommon::getMaterialPBR(GLTF::Options* options) 
 		}
 	}
 	if (values->diffuseTexture) {
-		GLTF::MaterialPBR::Texture* texture = new GLTF::MaterialPBR::Texture();
+		auto texture = std::make_shared<GLTF::MaterialPBR::Texture>();
 		texture->texCoord = values->diffuseTexCoord;
 		texture->texture = values->diffuseTexture;
 		material->metallicRoughness->baseColorTexture = texture;
@@ -886,15 +886,15 @@ GLTF::MaterialPBR* GLTF::MaterialCommon::getMaterialPBR(GLTF::Options* options) 
 		material->emissiveFactor = values->emission;
 	}
 	if (values->emissionTexture) {
-		GLTF::MaterialPBR::Texture* texture = new GLTF::MaterialPBR::Texture();
+		auto texture = std::make_shared<GLTF::MaterialPBR::Texture>();
 		texture->texCoord = values->emissionTexCoord;
 		texture->texture = values->emissionTexture;
 		material->emissiveTexture = texture;
-		material->emissiveFactor = new float[3]{ 1.0, 1.0, 1.0 };
+		material->emissiveFactor = std::shared_ptr<float[]>(new float[3]{ 1.0, 1.0, 1.0 });
 	}
 
 	if (values->ambientTexture) {
-		GLTF::MaterialPBR::Texture* texture = new GLTF::MaterialPBR::Texture();
+		auto texture = std::make_shared<GLTF::MaterialPBR::Texture>();
 		texture->texCoord = values->ambientTexCoord;
 		texture->texture = values->ambientTexture;
 		material->occlusionTexture = texture;
@@ -908,7 +908,7 @@ GLTF::MaterialPBR* GLTF::MaterialCommon::getMaterialPBR(GLTF::Options* options) 
 			material->specularGlossiness->specularFactor = values->specular;
 		}
 		if (values->specularTexture) {
-			GLTF::MaterialPBR::Texture* texture = new GLTF::MaterialPBR::Texture();
+			auto texture = std::make_shared<GLTF::MaterialPBR::Texture>();
 			texture->texCoord = values->specularTexCoord;
 			texture->texture = values->specularTexture;
 			material->specularGlossiness->specularGlossinessTexture = texture;
@@ -918,25 +918,20 @@ GLTF::MaterialPBR* GLTF::MaterialCommon::getMaterialPBR(GLTF::Options* options) 
 				material->specularGlossiness->glossinessFactor = values->shininess;
 			}
 			else {
-				material->specularGlossiness->glossinessFactor = new float[1] {1.0};
+				material->specularGlossiness->glossinessFactor = std::shared_ptr<float[]>(new float[1] {1.0});
 			}
 		}
 	}
 
 	if (values->bumpTexture) {
-		GLTF::MaterialPBR::Texture* texture = new GLTF::MaterialPBR::Texture();
+		auto texture = std::make_shared<GLTF::MaterialPBR::Texture>();
 		texture->texture = values->bumpTexture;
 		material->normalTexture = texture;
 	}
 
 	if (values->transparency) {
 		if (!material->metallicRoughness->baseColorFactor) {
-			float* baseColorFactor = new float[4];
-			baseColorFactor[0] = 1.0;
-			baseColorFactor[1] = 1.0;
-			baseColorFactor[2] = 1.0;
-			baseColorFactor[3] = 1.0;
-			material->metallicRoughness->baseColorFactor = baseColorFactor;
+			material->metallicRoughness->baseColorFactor = std::shared_ptr<float[]>(new float[4]{ 1.0, 1.0, 1.0, 1.0 });
 		}
 		float transparency = material->metallicRoughness->baseColorFactor[3];
 		transparency *= values->transparency[0];

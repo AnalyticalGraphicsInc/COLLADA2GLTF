@@ -11,8 +11,8 @@ namespace GLTF {
 	class Program : public GLTF::Object {
 	public:
 		std::set<std::string> attributes;
-		GLTF::Shader* fragmentShader = NULL;
-		GLTF::Shader* vertexShader = NULL;
+		std::shared_ptr<GLTF::Shader> fragmentShader;
+		std::shared_ptr<GLTF::Shader> vertexShader;
 
 		virtual std::string typeName();
 		virtual void writeJSON(void* writer, GLTF::Options* options);

@@ -10,13 +10,13 @@ namespace GLTF {
 		unsigned char* data = NULL;
 		size_t byteLength = 0;
 		std::string mimeType;
-		GLTF::BufferView* bufferView = NULL;
+		std::shared_ptr<GLTF::BufferView> bufferView;
 
 		Image(std::string uri);
 		Image(std::string uri, unsigned char* data, size_t byteLength, std::string fileExtension);
 		virtual ~Image();
 
-		static GLTF::Image* load(std::string path);
+		static std::shared_ptr<GLTF::Image> load(std::string path);
 		std::pair<int, int> getDimensions();
 		virtual std::string typeName();
 		virtual void writeJSON(void* writer, GLTF::Options* options);
